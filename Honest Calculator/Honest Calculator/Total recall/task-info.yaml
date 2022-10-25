@@ -1,0 +1,142 @@
+type: edu
+files:
+  - name: honest_calc.py
+    visible: true
+    text: |
+      # write your code here
+      data = input("Enter an equation").split(" ")
+      operators = ["+", "-", "*", "/"]
+      
+      if (not isinstance(data[0], int) and not isinstance(data[0], float)) or (
+              not isinstance(data[2], int) and not isinstance(data[2], float)):
+          print("Do you even know what numbers are? Stay focused!")
+      elif data[1] not in operators:
+          print("Yes ... an interesting math operation. You've slept through all classes, haven't you?")
+    learner_created: false
+  - name: tests.py
+    visible: false
+    text: |
+      from hstest import StageTest, CheckResult, WrongAnswer, dynamic_test, TestedProgram
+      
+      msg = ["Enter an equation",
+             "Do you even know what numbers are? Stay focused!",
+             "Yes ... an interesting math operation. You've slept through all classes, haven't you?",
+             "Yeah... division by zero. Smart move...",
+             "Do you want to store the result? (y / n):",
+             "Do you want to continue calculations? (y / n):"]
+      
+      
+      def add_enter(txt):
+          return "\n".join([txt, msg[0]])
+      
+      
+      def add_memory(txt):
+          return "\n".join([txt, msg[4]])
+      
+      
+      data = [
+                  (("4 * 5", add_memory("20.0")), ("y", msg[5]), ("n", "")),
+                  (("4 * 5.2", add_memory("20.8")), ("y", msg[5]), ("y", msg[0]),
+                   ("1 + M", add_memory("21.8")), ("y", msg[5]), ("n", "")),
+                  (("2 + 5", add_memory("7.0")), ("n", msg[5]), ("y", msg[0]),
+                   ("21.0 / M", add_enter(msg[3])), ("5 + M", add_memory("5.0")),
+                   ("y", msg[5]), ("n", "")),
+             ]  # (input data, msg sentence])
+      
+      
+      class HonestCalc(StageTest):
+          @dynamic_test(data=data)
+          def test(self, *items):
+              pr = TestedProgram()
+              output = pr.start()
+              if msg[0] not in output:
+                  return CheckResult.wrong(f"Expected: ({msg[0]});\nFound:    ({output.strip()})")
+              for item in items:
+                  output = pr.execute(item[0])
+                  if item[1] != output.strip():
+                      return CheckResult.wrong(f"Expected: ({item[1]});\nFound:    ({output.strip()})")
+              if not pr.is_finished():
+                  return CheckResult.wrong("Your program unnecessarily waiting for input.")
+      
+              return CheckResult.correct()
+      
+      
+      if __name__ == '__main__':
+          HonestCalc().run_tests()
+    learner_created: false
+  - name: honest_calculator.py
+    visible: true
+    text: |
+      class HonestCalculator:
+          def __init__(self):
+              self.data: list = []
+              self.operators: list = ["+", "-", "*", "/"]
+              self.operand_1: (int, float) = None
+              self.operand_2: (int, float) = None
+      
+          def start(self) -> None:
+              self.read_user_input()
+              self.check_equation()
+      
+          def read_user_input(self) -> None:
+              self.data = input("Enter an equation\n").split(" ")
+      
+          def check_equation(self) -> None:
+              while True:
+                  if self.check_operands(self.data[0]) and self.check_operands(self.data[2]) and self.check_operator():
+                      if self.data[2] != "0":
+                          self.operand_1 = self.get_operand_type(self.data[0])
+                          self.operand_2 = self.get_operand_type(self.data[2])
+      
+                          self.print_result()
+      
+                          break
+                      else:
+                          print("Yeah... division by zero. Smart move...")
+                  else:
+                      if not self.check_operands(self.data[0]) or not self.check_operands(self.data[2]):
+                          print("Do you even know what numbers are? Stay focused!")
+                      elif not self.check_operator():
+                          print("Yes ... an interesting math operation. You've slept through all classes, haven't you?")
+      
+                  self.read_user_input()
+      
+          @staticmethod
+          def check_operands(operand: str) -> bool:
+              try:
+                  if "." in operand and isinstance(float(operand), float):
+                      return True
+                  if isinstance(int(operand), int):
+                      return True
+      
+                  return False
+              except ValueError as e:
+                  return False
+      
+          def check_operator(self) -> bool:
+              return self.data[1] in self.operators
+      
+          @staticmethod
+          def get_operand_type(operand: str) -> (int, float):
+              if "." in operand and isinstance(float(operand), float):
+                  return float(operand)
+              if isinstance(int(operand), int):
+                  return int(operand)
+      
+          def print_result(self) -> None:
+              match self.data[1]:
+                  case "+":
+                      print(float(self.operand_1 + self.operand_2))
+                  case "-":
+                      print(float(self.operand_1 - self.operand_2))
+                  case "*":
+                      print(float(self.operand_1 * self.operand_2))
+                  case "/":
+                      print(self.operand_1 / self.operand_2)
+    learner_created: true
+feedback_link: https://hyperskill.org/learn/step/15812#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Tue, 25 Oct 2022 08:27:16 UTC
+record: 3
